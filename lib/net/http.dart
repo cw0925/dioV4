@@ -59,7 +59,7 @@ class Http extends DioForNative with HttpClientCreate {
     // ..add(CookieManager(
     //     PersistCookieJar(dir: StorageManager.temporaryDirectory.path)));
     ///此处可添加自定义header
-    options.headers["Os"] = Platform.isAndroid ? "android" : "ios";
+    // options.headers["Os"] = Platform.isAndroid ? "android" : "ios";
   }
 
   _setHttps() {

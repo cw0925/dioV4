@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
 class HeaderInterceptor extends InterceptorsWrapper {
@@ -25,14 +27,32 @@ class ApiInterceptor extends InterceptorsWrapper {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
 
-    print('请求返回：'+response.toString());
+    print('原始请求返回：'+response.toString());
 
-    handler.resolve(response);
+    if (response.statusCode == 200) {
+      final data =
+      (response.data is Map) ? response.data : json.decode(response.data);
+      RespData respData = RespData.fromJson(data);
+      if (respData.success) {
+        response.data = respData.data;
+        handler.resolve(response);
+      }else {
+        print('respData.fail请求返回：'+response.toString());
+        // return handleFailed(path, respData);
+      }
+    } else {
+      print('statusCode != 200请求返回：'+response.toString());
+      // final respData = RespData(
+      //     data: response.data,
+      //     returnCode: response.statusCode,
+      //     returnDesc: response.statusMessage);
+      // return handleFailed(path, respData);
+    }
   }
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
-    print('ERROR[${err.response?.statusCode}] => PATH:');
+    print('ERROR[${err.response}] => PATH:');
     handler.reject(err);
   }
 
@@ -51,7 +71,7 @@ class RespData {
 
   RespData({this.data, this.returnCode, this.returnDesc});
 
-  bool get success => returnCode % 17000 == 0;
+  bool get success => returnCode == 0;
 
   @override
   String toString() {
@@ -61,16 +81,16 @@ class RespData {
   Map<String, dynamic> toJson() {
     var map = Map<String, dynamic>();
 
-    map["data"] = data;
-    map["returnCode"] = returnCode;
-    map["returnDesc"] = returnDesc;
+    map["result"] = data;
+    map["state"] = returnCode;
+    map["message"] = returnDesc;
 
     return map;
   }
 
   RespData.fromJson(Map<String, dynamic> json) {
-    data = json["data"];
-    returnCode = json["returnCode"] ?? int.parse(json["code"]) + 17000;
-    returnDesc = json["returnCode"] == null ? json["msg"] : json["returnDesc"];
+    data = json["result"];
+    returnCode = json["state"] ?? int.parse(json["state"]);
+    returnDesc = json["message"] == null ? json["message"] : json["message"];
   }
 }

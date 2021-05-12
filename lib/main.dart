@@ -51,11 +51,11 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
   _netRequest() {
-    getRequest<Ball>('/cwl_admin/kjxx/findDrawNotice',data: {"name":'ssq',"issueCount":100}).then((value) => {
-      print('返回：'+value.toString())
-    });
-    // request('v1/taurus/getPicCode').then((value) => {
+    // getRequest<Ball>('/cwl_admin/kjxx/findDrawNotice',data: {"name":'ssq',"issueCount":100}).then((value) => {
     //   print('返回：'+value.toString())
     // });
+    request('v1/taurus/getPicCode').then((value) => {
+      print('返回：'+value.toString())
+    });
   }
 }

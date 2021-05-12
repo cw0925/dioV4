@@ -45,20 +45,14 @@ Future<dynamic> _requestImpl(
   ProgressCallback onSendProgress,
 }) async {
   try {
-    var requestOp = RequestOptions(
-        data: data,
-        queryParameters: queryParameters,
-        method: method,
-        onSendProgress: onSendProgress,
-        path: url);
-    var options = Options(
-      method: requestOp.method,
-    );
     var response = await http.request(
-        ApiList.mainBaseUrl + requestOp.path,
-        queryParameters: requestOp.queryParameters,
-        data: requestOp.data,
-        options: options,
+        ApiList.mainBaseUrl + url,
+        queryParameters: queryParameters,
+        data: data,
+        options: Options(
+            method: method,
+            responseType: ResponseType.json
+        ),
     );
     return response.data;
   } catch (e) {
