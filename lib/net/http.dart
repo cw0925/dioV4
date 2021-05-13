@@ -13,12 +13,20 @@ final Http http = Http();
 mixin HttpClientCreate {
 
   HttpClient createHttpClient(HttpClient client) {
-    SecurityContext sc = new SecurityContext(withTrustedRoots: true);
+    SecurityContext sc = new SecurityContext(withTrustedRoots: false);
     client = HttpClient(context: sc);
     client.badCertificateCallback =
         (X509Certificate cert, String host, int port) {
           return true;
     };
+    if (!kReleaseMode) {
+      ///
+      client.findProxy = (uri) {
+        //proxy all request to localhost:8888
+        ///设置代理
+        return 'PROXY 172.25.3.133:8888';
+      };
+    }
     return client;
   }
 

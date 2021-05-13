@@ -7,6 +7,7 @@ class HeaderInterceptor extends InterceptorsWrapper {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     ///动态添加请求头
     print("options: ${options.headers}");
+    // options.headers["Os"] = Platform.isAndroid ? 'android' : 'ios';
     handler.next(options);
   }
 }
@@ -18,16 +19,11 @@ class ApiInterceptor extends InterceptorsWrapper {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     _options = options;
-    print('REQUEST[${options.method}] => PATH: ${options.path}');
-    print('REQUEST[${options.queryParameters}] => PATH: ${options.queryParameters}');
-    print('REQUEST[${options.data}] => PATH: ${options.data}');
     handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-
-    print('原始请求返回：'+response.toString());
 
     if (response.statusCode == 200) {
       final data =
@@ -38,28 +34,39 @@ class ApiInterceptor extends InterceptorsWrapper {
         handler.resolve(response);
       }else {
         print('respData.fail请求返回：'+response.toString());
-        // return handleFailed(path, respData);
+        final respData = RespData(
+            data: response.data,
+            returnCode: response.statusCode,
+            returnDesc: response.statusMessage);
+        DioError err = DioError(
+            requestOptions: response.requestOptions,
+            response: Response(data: respData)
+        );
+        handler.reject(err);
       }
     } else {
-      print('statusCode != 200请求返回：'+response.toString());
-      // final respData = RespData(
-      //     data: response.data,
-      //     returnCode: response.statusCode,
-      //     returnDesc: response.statusMessage);
-      // return handleFailed(path, respData);
+      final respData = RespData(
+          data: response.data,
+          returnCode: response.statusCode,
+          returnDesc: response.statusMessage);
+      DioError err = DioError(
+          requestOptions: response.requestOptions,
+          response: Response(data: respData)
+      );
+      handler.reject(err);
     }
   }
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
-    print('ERROR[${err.response}] => PATH:');
+    print('onError === ERROR[${err.response}] => PATH:');
     handler.reject(err);
   }
 
   void handleFailed(ResponseInterceptorHandler handler , DioError err) {
+    print('handleFailed === ERROR[${err.response}] => PATH:');
     handler.reject(err);
   }
-
 }
 
 class RespData {
@@ -82,15 +89,15 @@ class RespData {
     var map = Map<String, dynamic>();
 
     map["result"] = data;
-    map["state"] = returnCode;
-    map["message"] = returnDesc;
+    map["error_code"] = returnCode;
+    map["reason"] = returnDesc;
 
     return map;
   }
 
   RespData.fromJson(Map<String, dynamic> json) {
     data = json["result"];
-    returnCode = json["state"] ?? int.parse(json["state"]);
-    returnDesc = json["message"] == null ? json["message"] : json["message"];
+    returnCode = json["error_code"] ?? int.parse(json["error_code"]);
+    returnDesc = json["reason"];
   }
 }

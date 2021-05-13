@@ -45,6 +45,7 @@ Future<dynamic> _requestImpl(
   ProgressCallback onSendProgress,
 }) async {
   try {
+    print('method:'+method);
     var response = await http.request(
         ApiList.mainBaseUrl + url,
         queryParameters: queryParameters,

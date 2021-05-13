@@ -51,11 +51,15 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
   _netRequest() {
+    //a9ed2a336f95e912111faaf2ead798fb
+    // getRequest<String>('jztk/query',data: {"key":'88134775dcf8c7e9f33ff2f4f4fedf45','subject':1,'model':'c1'}).then((value) => {
+    //   print('返回：'+value.toString())
+    // });
     // getRequest<Ball>('/cwl_admin/kjxx/findDrawNotice',data: {"name":'ssq',"issueCount":100}).then((value) => {
     //   print('返回：'+value.toString())
     // });
-    request('v1/taurus/getPicCode').then((value) => {
-      print('返回：'+value.toString())
-    });
+    // request<String>('jztk/query',data: {"key":'88134775dcf8c7e9f33ff2f4f4fedf45','subject':1,'model':'c1'}).then((value) => {
+    //   print('返回：'+value.toString())
+    // });
   }
 }
